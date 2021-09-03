@@ -65,7 +65,7 @@ def get_secret_word(words):
 
 #show the board and the blank to the player
 def show_game_board(hangmanpics, missed_letter, correct_letter, secret_word):
-    #init the blank string base on the len of secret word
+    #init the blank string base on len of secret word
     blank = '_' * len(secret_word)
 
     #print the hangman part pic
@@ -80,8 +80,19 @@ def show_game_board(hangmanpics, missed_letter, correct_letter, secret_word):
             if secret_word[i] in correct_letter:
                 blank = blank[:i] + secret_word[i] + blank[i+1:]
 
-    #print the update the string
+    #return the guess letter string
     print(blank)
+
+#ask player guess
+def player_guess():
+    while True:
+        player_guess = input('Guess letter: ').lower()
+
+        if len(player_guess) > 1:
+            print('Please enter one letter only!!!')
+        else:
+            break
+    return player_guess.lower()
 
 #check if letter is in secret word
 def check_letter(guess_letter, secret_word):
@@ -96,16 +107,6 @@ def found_all_word(correct_letter, secret_word):
     else:
         return True
 
-#ask player guess
-def player_guess():
-    while True:
-        player_guess = input('Guess letter: ').lower()
-
-        if len(player_guess) > 1:
-            print('Please enter one letter only!!!')
-        else:
-            break
-    return player_guess.lower()
 
 #Play game
 while True:

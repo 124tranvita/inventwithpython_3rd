@@ -1,6 +1,7 @@
 import random
 import time
 
+#display the intro of the game
 def displayIntro():
     print('You are in a land full of dragons. In front of you,')
     print('you see two caves. In one cave, the dragon is friendly')
@@ -8,6 +9,7 @@ def displayIntro():
     print('is greedy and hungry, and will eat you on sight.')
     print()
 
+#ask player to choose what cave will be go into
 def chooseCave():
     choice = 0
     while choice not in [1, 2]:
@@ -20,7 +22,8 @@ def chooseCave():
 
     return choice
 
-def checkCave(chooseCave):
+#check the dragon in this cave is friendly or not by random.randint()
+def checkCave(chosenCave):
     print('You approach the cave...')
     time.sleep(2) 
     print('It is dark and spooky...')
@@ -30,7 +33,7 @@ def checkCave(chooseCave):
 
     friendlyDragon = random.randint(1,2)
 
-    if chooseCave == friendlyDragon:
+    if chosenCave == friendlyDragon:
         print('Gives you his treasure!')
     else:
         print('Gobbles you down in one bite')
@@ -42,8 +45,8 @@ while True:
 
     checkCave(caveNumber)
 
+    #ask player if they want to play again or not
     choice = input('Play again? Y or N')
-
     if choice[0].lower() == 'y':
         continue
     else:

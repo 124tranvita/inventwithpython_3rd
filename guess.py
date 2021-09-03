@@ -38,6 +38,7 @@ while True:
         
     else:
         print('\nNope. My number I was thinking of is {}'.format(rand_num))
+        
     #ask user to continue or not if they game over   
     choice = input('Are you want to play again? Y or N')
 
