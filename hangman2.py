@@ -55,13 +55,36 @@ HANGMANPICS = ['''
    /|\  |
    / \  |
         |
+=========''',
+'''
+    +---+
+    |   |
+   [o   |
+   /|\  |
+   / \  |
+        |
+=========''',
+'''
+    +---+
+    |   |
+   [o]  |
+   /|\  |
+   / \  |
+        |
 =========''']
 
-words = 'ant baboon badger bat bear beaver camel cat clam cobra cougar coyote crow deer dog donkey duck eagle ferret fox frog goat goose hawk lion lizard llama mole monkey moose mouse mule newt otter owl panda parrot pigeon python rabbit ram rat raven rhino salmon seal shark sheep skunk sloth snake spider stork swan tiger toad trout turkey turtle weasel whale wolf wombat zebra'.split()
-
+words = {'Colors':'red orange yellow green blue indigo violet white black brown'.split(),
+'Shapes':'square triangle rectangle circle ellipse rhombus trapezoid chevron pentagon hexagon septagon octagon'.split(),
+'Fruits':'apple orange lemon lime pear watermelon grape grapefruit cherry banana cantaloupe mango strawberry tomato'.split(),
+'Animals':'bat bear beaver cat cougar crab deer dog donkey duck eagle fish frog goat leech lion lizard monkey moose mouse otter owl panda python rabbit rat shark sheep skunk squid tiger turkey turtle weasel whale wolf wombat zebra'.split()}
 #get secret word
 def get_secret_word(words):
-    return words[random.randint(0, len(words) - 1)]
+    #select random key in words dictionary
+    word_key = random.choice(list(words.keys()))
+    #select random word in word key set
+    word_index = random.choice(words[word_key])
+    #return the set of key and word
+    return (word_key, word_index)
 
 #print the game board
 def display_game_board(secret_word, missed_letter, correct_letter):
@@ -98,18 +121,19 @@ while True:
     #init value
     correct_letter = ''
     missed_letter = ''
+    #come up with the secret word
+    secret_set, secret_word = get_secret_word(words)
     play_on = True
 
     #begin game
     while play_on:
-        #come up with a secret word
-        secret_word = get_secret_word(words)
-
         #show the board and blank to player
         display_game_board(secret_word, missed_letter, correct_letter)
 
+        print('The secret word is in the set: {}'.format(secret_set))
         #ask player to guess letter
         guess_letter = player_guess()
+        
         #if guessed letter is in secret word
         while guess_letter in secret_word:
             #if guessed letter is in serect word but already guess
@@ -133,7 +157,7 @@ while True:
             print('Yes! The secret word is "{}"! You have won!'.format(secret_word))
             play_on = False
             break
-        
+
         #if player has run out of body part and lose
         if len(missed_letter) == len(HANGMANPICS) - 1:
             print(HANGMANPICS[len(missed_letter)])
@@ -142,8 +166,8 @@ while True:
             break
 
     #ask user to play again
-    choice = input('Play again? Y or N')
-    if choice[0].lower() == 'y':
+    choice = input('Play again? Y or N ')
+    if choice.lower().startswith('y'):
         continue
     else:
         print('Thank for playing game!!!')
