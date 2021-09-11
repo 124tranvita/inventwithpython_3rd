@@ -253,75 +253,138 @@ def show_point(player_tile, computer_tile):
 
     print('You have {} points. The computer has {} points.'.format(score[player_tile], score[computer_tile]))
 
+#AI SIM 3 PART
+def get_random_move(board, tile):
+    # Return a random move
+    return random.choice(get_valid_moves(board, tile))
+
+def is_on_side(x, y):
+    return x == 0 or x == 7 or y == 0 or y == 7
+
+def get_corner_side_best_move(board, tile):
+    # Return a corner move, or a side move, or the best moves
+    possible_moves = get_valid_moves(board, tile)
+
+    # Randomize the the other of the possible move list
+    random.shuffle(possible_moves)
+
+    # Always go for corner if available
+    for x, y in possible_moves:
+        if is_on_corner(x, y):
+            return [x, y]
+
+    # If there are no cornet, return a side move
+    for x, y in possible_moves:
+        if is_on_side(x, y):
+            return [x, y]
+
+    return get_computer_move(board, tile)
+
+def get_side_best_move(board, tile):
+    # Return a corner move, or a side move, or the best moves
+    possible_moves = get_valid_moves(board, tile)
+
+    # Randomize the order of the possible moves
+    random.shuffle(possible_moves)
+
+    # Return a side move, if availabe
+    for x, y in possible_moves:
+        if is_on_side(x, y):
+            return [x, y]
+    
+    return get_computer_move(board, tile)
+
+def get_worst_move(board, tile):
+    # Return the move that flips the least number of tiles
+    possible_moves = get_valid_moves(board, tile)
+
+    # Randomize the order of the possible moves
+    random.shuffle(possible_moves)
+
+    # Go through all the possible moves and remember the best scoring moves
+    worst_score = 64
+    for x, y in possible_moves:
+        dupe_board = get_board_copy(board)
+        make_move(dupe_board, tile, x, y)
+        score = get_score_of_board(dupe_board)[tile]
+
+        if score < worst_score:
+            worst_move = [x, y]
+            worst_score = score
+
+    return worst_move
+
+def get_corner_worst_move(board, tile):
+    # Return the move that flips the least number of tiles
+    possible_moves = get_valid_moves(board, tile)
+
+    # Randomize the order of the possible moves
+    random.shuffle(possible_moves)
+
+    # Always go for the corner if available
+    for x, y in possible_moves:
+        if is_on_corner(x, y):
+            return [x, y]
+
+    return get_worst_move(board, tile)
+
 # The Start of The Game
 print('Welcome to Reversi!!!')
 
-while True:
+x_wins = 0
+o_wins = 0
+ties = 0
+num_games = int(input('Enter the number of games to run: '))
+
+for game in range(num_games):
+    print(f'Game #{game}:', end=' ')
     # Reset the board and the game
     board = get_new_board()
     reset_board(board)
-    player_tile, computer_tile = enter_player_tile()
-    show_hint = False
-    turn = who_goes_first()
-    print(f'The {turn} will go first!')
 
+    if who_goes_first() == 'Player':
+        turn = 'X'
+    else:
+        turn = 'O'
     
     while True:
-        # Running the Player's Turn
-        if turn == 'Player':
-            if show_hint:
-                valid_moves_board = get_board_with_valid_moves(board, player_tile)
-                draw_board(valid_moves_board)
-            else:
-                draw_board(board)
-            
-            show_point(player_tile, computer_tile)
+        # Drawing Everything on the Screen
+        # Display the final score
+        score = get_score_of_board(board)
 
-            move = get_player_move(board, player_tile)
-            if move == 'quit':
-                print('Thank for playing!!!')
-                sys.exit()
-            elif move == 'hints':
-                show_hint = not show_hint
-                continue
-            else:
-                make_move(board, player_tile, move[0], move[1])
-
-            # Make the Player's Move
-            if get_valid_moves(board, computer_tile) == []:
-                break
-            else:
-                turn = 'Computer'
-        
-        # Running the Computer's Turn
+        if turn == 'X':
+            # X's turn
+            other_tile = 'O'
+            x, y = get_computer_move(board, 'X')
+            make_move(board, 'X', x, y)
         else:
-            draw_board(board)
-            show_point(player_tile, computer_tile)
-            input("Press enter to see computer's move.")
-            x, y = get_computer_move(board, computer_tile)
-            make_move(board, computer_tile, x, y)
+            # O's turn
+            other_tile = 'X'
+            x, y = get_corner_side_best_move(board, 'O')
+            make_move(board, 'O', x, y)
+        
+        if get_valid_moves(board, other_tile) == []:
+            break
+        else:
+            turn = other_tile
 
-            if get_valid_moves(board, player_tile) == []:
-                break
-            else:
-                turn = 'Player'
-
-    # Drawing Everything on the Screen
     # Display the final score
-    draw_board(board)
     score = get_score_of_board(board)
 
     print('X scored {} points. O scored {} points'.format(score['X'], score['O']))
 
-    if score[player_tile] > score[computer_tile]:
-        print('You have beat the Computer by {} point. Congratulation!'.format(score[player_tile] - score[computer_tile]))
-    elif score[player_tile] < score[computer_tile]:
-        print('You lost. The Computer beat you by {} points.'.format(score[computer_tile] - score[player_tile]))
+    if score['X'] > score['O']:
+        x_wins += 1
+    elif score['X'] < score['O']:
+        o_wins += 1
     else:
-        print('The game was tie!')
+        ties += 1
 
-    # Ask the Player to Play Again
-    if not play_again():
-        break
+num_games = float(num_games)
+x_percent = round(((x_wins / num_games) * 100), 2)
+o_percent = round(((o_wins / num_games) * 100), 2)
+tie_percent = round(((ties / num_games) * 100), 2)
+
+print(f'X win {x_wins} games ({x_percent}%), O win {o_wins} games ({o_percent}%), ties for {ties}  game ({tie_percent}%) of total {int(num_games)} games!')
 
 

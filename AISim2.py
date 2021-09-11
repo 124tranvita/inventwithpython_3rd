@@ -256,72 +256,60 @@ def show_point(player_tile, computer_tile):
 # The Start of The Game
 print('Welcome to Reversi!!!')
 
-while True:
+x_wins = 0
+o_wins = 0
+ties = 0
+num_games = int(input('Enter the number of games to run: '))
+
+for game in range(num_games):
+    print(f'Game #{game}:', end=' ')
     # Reset the board and the game
     board = get_new_board()
     reset_board(board)
-    player_tile, computer_tile = enter_player_tile()
-    show_hint = False
-    turn = who_goes_first()
-    print(f'The {turn} will go first!')
 
+    if who_goes_first() == 'Player':
+        turn = 'X'
+    else:
+        turn = 'O'
     
     while True:
-        # Running the Player's Turn
-        if turn == 'Player':
-            if show_hint:
-                valid_moves_board = get_board_with_valid_moves(board, player_tile)
-                draw_board(valid_moves_board)
-            else:
-                draw_board(board)
-            
-            show_point(player_tile, computer_tile)
+        # Drawing Everything on the Screen
+        # Display the final score
+        score = get_score_of_board(board)
 
-            move = get_player_move(board, player_tile)
-            if move == 'quit':
-                print('Thank for playing!!!')
-                sys.exit()
-            elif move == 'hints':
-                show_hint = not show_hint
-                continue
-            else:
-                make_move(board, player_tile, move[0], move[1])
-
-            # Make the Player's Move
-            if get_valid_moves(board, computer_tile) == []:
-                break
-            else:
-                turn = 'Computer'
-        
-        # Running the Computer's Turn
+        if turn == 'X':
+            # X's turn
+            other_tile = 'O'
+            x, y = get_computer_move(board, 'X')
+            make_move(board, 'X', x, y)
         else:
-            draw_board(board)
-            show_point(player_tile, computer_tile)
-            input("Press enter to see computer's move.")
-            x, y = get_computer_move(board, computer_tile)
-            make_move(board, computer_tile, x, y)
+            # O's turn
+            other_tile = 'X'
+            x, y = get_computer_move(board, 'O')
+            make_move(board, 'O', x, y)
+        
+        if get_valid_moves(board, other_tile) == []:
+            break
+        else:
+            turn = other_tile
 
-            if get_valid_moves(board, player_tile) == []:
-                break
-            else:
-                turn = 'Player'
-
-    # Drawing Everything on the Screen
     # Display the final score
-    draw_board(board)
     score = get_score_of_board(board)
 
     print('X scored {} points. O scored {} points'.format(score['X'], score['O']))
 
-    if score[player_tile] > score[computer_tile]:
-        print('You have beat the Computer by {} point. Congratulation!'.format(score[player_tile] - score[computer_tile]))
-    elif score[player_tile] < score[computer_tile]:
-        print('You lost. The Computer beat you by {} points.'.format(score[computer_tile] - score[player_tile]))
+    if score['X'] > score['O']:
+        x_wins += 1
+    elif score['X'] < score['O']:
+        o_wins += 1
     else:
-        print('The game was tie!')
+        ties += 1
 
-    # Ask the Player to Play Again
-    if not play_again():
-        break
+num_games = float(num_games)
+x_percent = round(((x_wins / num_games) * 100), 2)
+o_percent = round(((o_wins / num_games) * 100), 2)
+tie_percent = round(((ties / num_games) * 100), 2)
+
+print(f'X win {x_wins} games ({x_percent}%), O win {o_wins} games ({o_percent}%), ties for {ties}  game ({tie_percent}%) of total {int(num_games)} games!')
 
 
